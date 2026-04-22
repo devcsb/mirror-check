@@ -9,351 +9,468 @@
 <meta property="og:description" content="웹페이지의 '도움됐어요' 버튼이 진짜 서버 집계인지 거울 속 자기 자신인지 3초 만에 확인." />
 <meta property="og:type" content="website" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%AA%9E%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #faf7f2;
-    --bg-alt: #f3efe6;
-    --surface: #ffffff;
-    --fg: #1f1f1e;
-    --fg-muted: #6b6860;
-    --fg-soft: #8a867d;
-    --accent: #cc785c;
-    --accent-ink: #8c4a33;
-    --border: #e8e1d1;
-    --border-strong: #d4ccba;
-    --fake: #c0392b;
-    --fake-bg: #fbeae7;
-    --real: #2f7d3a;
-    --real-bg: #e7f3e8;
-    --mixed: #b37a0e;
-    --mixed-bg: #fbf2dc;
-    --serif: "Tiempos Text", "Source Serif Pro", ui-serif, Georgia, serif;
-    --sans: -apple-system, BlinkMacSystemFont, "Inter", "Pretendard", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
-    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
-    --radius: 14px;
-    --shadow-sm: 0 1px 2px rgba(31,31,30,.04), 0 1px 3px rgba(31,31,30,.06);
-    --shadow-md: 0 4px 12px rgba(31,31,30,.06), 0 2px 4px rgba(31,31,30,.04);
-    --shadow-lg: 0 20px 50px -10px rgba(140,74,51,.18), 0 8px 16px rgba(31,31,30,.06);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #14120f;
-      --bg-alt: #1c1916;
-      --surface: #1f1c18;
-      --fg: #f0ebe1;
-      --fg-muted: #a8a196;
-      --fg-soft: #766f63;
-      --border: #2b2720;
-      --border-strong: #3a352c;
-      --fake-bg: #3a1a15;
-      --real-bg: #14301a;
-      --mixed-bg: #352812;
-    }
+    --bg: #0a0a0a;
+    --bg-1: #101012;
+    --bg-2: #16161a;
+    --surface: #121215;
+    --surface-hi: #1a1a1f;
+    --border: #1f1f24;
+    --border-hi: #2a2a30;
+    --fg: #fafafa;
+    --fg-1: #ededed;
+    --fg-2: #a1a1aa;
+    --fg-3: #71717a;
+    --fg-4: #52525b;
+    --accent: #b4ff39;
+    --accent-glow: rgba(180, 255, 57, .15);
+    --accent-soft: rgba(180, 255, 57, .08);
+    --fake: #ff5a5a;
+    --fake-bg: rgba(255, 90, 90, .1);
+    --real: #5ee684;
+    --real-bg: rgba(94, 230, 132, .1);
+    --mixed: #ffb23f;
+    --mixed-bg: rgba(255, 178, 63, .1);
+    --sans: "Geist", -apple-system, BlinkMacSystemFont, "Inter", "Pretendard", "Apple SD Gothic Neo", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
-    color: var(--fg);
-    font: 16px/1.65 var(--sans);
+    background: var(--bg); color: var(--fg);
+    font: 15px/1.55 var(--sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11";
   }
-  a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-  a:hover { color: var(--accent); }
-  code { font-family: var(--mono); font-size: .9em; background: var(--bg-alt); padding: 1px 6px; border-radius: 4px; }
+  a { color: var(--fg); text-decoration: none; }
+  code, .mono { font-family: var(--mono); font-size: .88em; }
+  ::selection { background: var(--accent); color: var(--bg); }
 
+  /* ─── NAV ─── */
   .nav {
-    max-width: 1080px; margin: 0 auto; padding: 20px 24px;
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10, 10, 10, .8);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: 1180px; margin: 0 auto; padding: 14px 24px;
     display: flex; justify-content: space-between; align-items: center;
   }
-  .brand { font-weight: 600; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
-  .brand-mark { font-size: 20px; }
-  .nav-links { display: flex; gap: 20px; font-size: 14px; color: var(--fg-muted); }
-  .nav-links a { color: inherit; text-decoration: none; }
-  .nav-links a:hover { color: var(--fg); }
+  .brand {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 600; font-size: 14px; letter-spacing: -.01em;
+  }
+  .brand-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+  }
+  .nav-links { display: flex; gap: 4px; font-size: 13px; }
+  .nav-links a {
+    color: var(--fg-2); padding: 6px 12px; border-radius: var(--r-sm);
+    transition: background .15s, color .15s;
+  }
+  .nav-links a:hover { color: var(--fg); background: var(--surface); }
+  .nav-cta {
+    font-size: 13px; font-weight: 500; padding: 7px 14px;
+    border-radius: var(--r-sm); background: var(--fg); color: var(--bg);
+    transition: opacity .15s;
+  }
+  .nav-cta:hover { opacity: .85; }
 
-  main { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  main { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
   /* ─── HERO ─── */
-  .hero { padding: 64px 0 48px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
-  .hero-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 10px; border-radius: 100px;
-    background: var(--bg-alt); border: 1px solid var(--border);
-    font-size: 12px; font-weight: 500; color: var(--fg-muted);
-    letter-spacing: .02em;
+  .hero {
+    position: relative;
+    padding: 96px 0 72px;
+    display: grid; grid-template-columns: 1.15fr .85fr;
+    gap: 64px; align-items: center;
+    isolation: isolate;
   }
-  .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .hero::before {
+    content: "";
+    position: absolute; inset: -40px -80px 0; z-index: -1;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 30%, var(--accent-soft), transparent 70%),
+      radial-gradient(circle at 50% 50%, transparent 20%, var(--bg) 70%),
+      radial-gradient(circle at 1px 1px, var(--border-hi) 1px, transparent 0);
+    background-size: auto, auto, 28px 28px;
+    opacity: .8;
+    mask-image: radial-gradient(ellipse 70% 80% at 50% 40%, #000, transparent 90%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 40%, #000, transparent 90%);
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 11px 5px 7px; border-radius: 100px;
+    background: var(--surface); border: 1px solid var(--border-hi);
+    font-size: 12px; font-weight: 500; color: var(--fg-2);
+    letter-spacing: -.005em;
+  }
+  .badge-chip {
+    background: var(--accent); color: var(--bg);
+    font-size: 10px; font-weight: 600; letter-spacing: .04em;
+    padding: 2px 7px; border-radius: 100px; text-transform: uppercase;
+  }
+
   .hero h1 {
-    font-family: var(--serif);
-    font-size: clamp(38px, 5.2vw, 60px);
-    line-height: 1.12; letter-spacing: -.025em;
-    margin: 18px 0 20px; font-weight: 500;
+    font-family: var(--sans);
+    font-size: clamp(42px, 6vw, 72px);
+    line-height: 1; letter-spacing: -.045em;
+    margin: 20px 0 20px; font-weight: 600;
     word-break: keep-all;
   }
   .hero h1 .line { display: block; }
   .hero h1 em {
-    font-style: italic;
-    color: var(--accent-ink);
-    font-weight: 500;
+    font-style: normal;
+    background: linear-gradient(100deg, var(--accent) 0%, #7dff9d 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
   }
-  .hero-sub { font-size: 18px; color: var(--fg-muted); max-width: 520px; margin: 0 0 28px; }
-  .hero-sub b { color: var(--fg); font-weight: 600; }
+  .hero-sub {
+    font-size: 17px; line-height: 1.55;
+    color: var(--fg-2); max-width: 520px; margin: 0 0 32px;
+    letter-spacing: -.005em;
+  }
+  .hero-sub b { color: var(--fg); font-weight: 500; }
 
   .drag-zone {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow-md);
+    border-radius: var(--r-lg);
+    padding: 16px;
+    display: flex; align-items: center; gap: 16px;
   }
-  .drag-label { font-size: 12px; font-weight: 600; color: var(--fg-soft); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
   .drag {
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    padding: 16px 22px; border-radius: 10px;
-    background: var(--fg); color: var(--bg);
-    font-weight: 600; font-size: 16px;
-    text-decoration: none; user-select: none; cursor: grab;
-    transition: transform .15s ease, box-shadow .15s ease;
-    border: 1px solid var(--fg);
+    flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 20px; border-radius: var(--r-md);
+    background: var(--accent); color: var(--bg);
+    font-family: var(--sans); font-weight: 600; font-size: 15px;
+    letter-spacing: -.01em;
+    user-select: none; cursor: grab;
+    transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 0 0 1px var(--accent), 0 8px 24px -4px var(--accent-glow);
   }
-  .drag:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); color: var(--bg); }
+  .drag:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--accent), 0 12px 32px -4px var(--accent-glow); color: var(--bg); }
   .drag:active { cursor: grabbing; transform: translateY(0); }
-  .drag-hint { margin-top: 12px; font-size: 13px; color: var(--fg-muted); line-height: 1.5; }
-  .drag-hint kbd { font-family: var(--mono); font-size: 11px; background: var(--bg-alt); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
+  .drag-arrow { font-family: var(--mono); font-size: 13px; opacity: .7; }
+  .drag-hint { font-size: 13px; color: var(--fg-3); line-height: 1.45; }
+  .drag-hint b { color: var(--fg-1); font-weight: 500; }
+  .drag-hint kbd {
+    font-family: var(--mono); font-size: 11px;
+    background: var(--bg-1); border: 1px solid var(--border-hi); border-radius: 4px;
+    padding: 1px 5px; color: var(--fg-2);
+  }
 
-  /* Hero illustration: stacked mock panel */
-  .hero-art { position: relative; height: 100%; min-height: 340px; }
+  /* Hero illustration */
+  .hero-art { position: relative; height: 100%; min-height: 380px; display: flex; align-items: center; justify-content: flex-end; }
   .mock-panel {
-    position: absolute; width: 300px;
-    background: #0f1317; color: #e6edf3;
-    border-radius: 12px; border: 1px solid #2b313a;
-    font-family: var(--mono); font-size: 11px; line-height: 1.5;
-    box-shadow: 0 30px 60px -20px rgba(140,74,51,.35), 0 12px 24px rgba(31,31,30,.12);
+    width: 310px;
+    background: #0c0c0e; color: #ededed;
+    border-radius: var(--r-lg); border: 1px solid #1f1f24;
+    font-family: var(--mono); font-size: 11.5px; line-height: 1.5;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.02),
+      0 40px 80px -20px rgba(0,0,0,.8),
+      0 16px 32px -8px rgba(180,255,57,.08);
     overflow: hidden;
   }
-  .mock-panel-1 { top: 0; right: 0; transform: rotate(2.5deg); z-index: 2; }
-  .mock-panel-2 { top: 60px; right: 80px; transform: rotate(-3deg); z-index: 1; opacity: .92; }
+  .mock-panel-1 { position: relative; transform: rotate(1.5deg); z-index: 2; }
+  .mock-panel-2 { position: absolute; top: 40px; right: 130px; transform: rotate(-2.5deg); z-index: 1; opacity: .7; }
   .mock-head {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 14px; background: #161b22; border-bottom: 1px solid #2b313a;
+    padding: 10px 14px; background: #101014; border-bottom: 1px solid #1f1f24;
   }
-  .mock-title { font-family: var(--sans); font-weight: 600; font-size: 12px; color: #f0ebe1; display: flex; align-items: center; gap: 6px; }
-  .mock-close { font-family: var(--sans); font-size: 10px; color: #c9d1d9; background: #21262d; border: 1px solid #30363d; border-radius: 5px; padding: 3px 8px; }
+  .mock-title { font-family: var(--sans); font-weight: 600; font-size: 12px; color: #fafafa; display: flex; align-items: center; gap: 7px; letter-spacing: -.01em; }
+  .mock-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+  .mock-close { font-family: var(--sans); font-size: 11px; color: #a1a1aa; background: #1a1a1f; border: 1px solid #2a2a30; border-radius: 5px; padding: 3px 9px; }
   .mock-body { padding: 12px 14px; }
-  .mock-verdict { padding: 8px 10px; border-radius: 8px; background: #161b22; border-left: 3px solid; margin-bottom: 10px; }
-  .mock-verdict-fake { border-color: #f85149; }
-  .mock-verdict-fake .mock-tag { color: #f85149; }
-  .mock-verdict-real { border-color: #3fb950; }
-  .mock-verdict-real .mock-tag { color: #3fb950; }
-  .mock-tag { font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .06em; margin-bottom: 2px; }
-  .mock-msg { font-family: var(--sans); color: #c9d1d9; font-size: 11px; }
-  .mock-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
-  .mock-stat { background: #161b22; border: 1px solid #2b313a; border-radius: 5px; padding: 5px 4px; text-align: center; }
-  .mock-stat.on { background: #1c2430; border-color: #3a4552; }
-  .mock-stat-l { font-family: var(--sans); color: #6b7280; font-size: 9px; letter-spacing: .04em; }
-  .mock-stat.on .mock-stat-l { color: #8b949e; }
-  .mock-stat-v { font-family: var(--sans); font-weight: 600; font-size: 13px; color: #4b5563; }
-  .mock-stat.on .mock-stat-v { color: #f0ebe1; }
-  .mock-row { display: flex; align-items: center; gap: 6px; padding: 5px 7px; border-radius: 4px; background: #161b22; margin-bottom: 3px; font-size: 10.5px; }
-  .mock-key { color: #e6edf3; font-weight: 500; }
-  .mock-badge { color: #d29922; background: #2b2311; padding: 0 5px; border-radius: 3px; font-weight: 600; font-size: 9.5px; }
-  .mock-val { color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mock-meth { color: #7ee787; font-weight: 600; font-size: 9.5px; min-width: 36px; }
-  .mock-section { color: #7d8590; font-family: var(--sans); font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin: 8px 2px 5px; }
+  .mock-verdict { padding: 10px 12px; border-radius: var(--r-md); background: #101014; border-left: 3px solid; margin-bottom: 12px; }
+  .mock-verdict-fake { border-color: var(--fake); }
+  .mock-verdict-fake .mock-tag { color: var(--fake); }
+  .mock-verdict-real { border-color: var(--real); }
+  .mock-verdict-real .mock-tag { color: var(--real); }
+  .mock-tag { font-family: var(--sans); font-weight: 600; font-size: 11px; letter-spacing: .04em; margin-bottom: 3px; }
+  .mock-msg { font-family: var(--sans); color: #d4d4d8; font-size: 11.5px; letter-spacing: -.005em; }
+  .mock-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 10px; }
+  .mock-stat { background: #101014; border: 1px solid #1f1f24; border-radius: var(--r-sm); padding: 7px 4px; text-align: center; }
+  .mock-stat.on { background: #15150e; border-color: #2d3118; }
+  .mock-stat-l { font-family: var(--sans); color: #52525b; font-size: 9.5px; letter-spacing: .02em; text-transform: uppercase; }
+  .mock-stat.on .mock-stat-l { color: #a1a1aa; }
+  .mock-stat-v { font-family: var(--sans); font-weight: 600; font-size: 15px; color: #3f3f46; margin-top: 2px; letter-spacing: -.02em; }
+  .mock-stat.on .mock-stat-v { color: var(--accent); }
+  .mock-row { display: flex; align-items: center; gap: 7px; padding: 6px 8px; border-radius: 5px; background: #101014; margin-bottom: 3px; font-size: 10.5px; }
+  .mock-key { color: #ededed; font-weight: 500; }
+  .mock-badge { color: var(--mixed); background: rgba(255,178,63,.12); padding: 1px 6px; border-radius: 3px; font-weight: 500; font-size: 9.5px; }
+  .mock-val { color: #71717a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mock-section { color: #52525b; font-family: var(--sans); font-size: 9.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; margin: 10px 2px 6px; }
 
-  /* ─── SECTION ─── */
-  section { padding: 72px 0; border-top: 1px solid var(--border); }
-  .section-head { max-width: 640px; margin: 0 0 40px; }
-  .section-kicker { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
-  .section-title { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 38px); line-height: 1.15; letter-spacing: -.02em; margin: 0 0 12px; font-weight: 500; }
-  .section-lede { font-size: 17px; color: var(--fg-muted); margin: 0; }
+  /* ─── SECTIONS ─── */
+  section { padding: 96px 0; border-top: 1px solid var(--border); }
+  .section-head { max-width: 720px; margin: 0 0 48px; }
+  .kicker {
+    display: inline-block; font-family: var(--mono);
+    font-size: 12px; font-weight: 500;
+    color: var(--accent); letter-spacing: 0; margin-bottom: 14px;
+  }
+  .kicker::before { content: "[ "; color: var(--fg-4); }
+  .kicker::after { content: " ]"; color: var(--fg-4); }
+  h2 {
+    font-family: var(--sans); font-size: clamp(30px, 3.8vw, 44px);
+    line-height: 1.05; letter-spacing: -.035em;
+    margin: 0 0 14px; font-weight: 600;
+    word-break: keep-all;
+  }
+  .lede {
+    font-size: 17px; color: var(--fg-2); margin: 0;
+    max-width: 600px; letter-spacing: -.005em;
+  }
 
   /* Verdict cards */
-  .verdicts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .verdicts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .verdict {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 24px;
+    border-radius: var(--r-lg); padding: 24px;
     display: flex; flex-direction: column; gap: 14px;
-    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    transition: border-color .2s, background .2s;
+    position: relative; overflow: hidden;
   }
-  .verdict:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
-  .verdict-badge { align-self: flex-start; padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+  .verdict::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--tone), transparent);
+    opacity: 0; transition: opacity .2s;
+  }
+  .verdict:hover { border-color: var(--border-hi); background: var(--surface-hi); }
+  .verdict:hover::before { opacity: 1; }
+  .verdict-fake { --tone: var(--fake); }
+  .verdict-real { --tone: var(--real); }
+  .verdict-mixed { --tone: var(--mixed); }
+  .verdict-head { display: flex; justify-content: space-between; align-items: center; }
+  .verdict-badge {
+    padding: 4px 10px; border-radius: var(--r-sm);
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .02em;
+  }
   .verdict-fake .verdict-badge { background: var(--fake-bg); color: var(--fake); }
   .verdict-real .verdict-badge { background: var(--real-bg); color: var(--real); }
   .verdict-mixed .verdict-badge { background: var(--mixed-bg); color: var(--mixed); }
-  .verdict-title { font-family: var(--serif); font-size: 22px; font-weight: 500; margin: 0; letter-spacing: -.01em; }
-  .verdict-desc { color: var(--fg-muted); font-size: 14px; margin: 0; }
-  .verdict-signals { display: flex; gap: 8px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+  .verdict-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 8px var(--tone); }
+  .verdict-title { font-size: 19px; font-weight: 600; margin: 0; letter-spacing: -.02em; }
+  .verdict-desc { color: var(--fg-2); font-size: 14px; margin: 0; line-height: 1.55; }
+  .verdict-signals { display: flex; gap: 6px; margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); }
   .signal {
-    font-size: 11px; padding: 4px 10px; border-radius: 6px;
-    background: var(--bg-alt); color: var(--fg-muted);
+    font-family: var(--mono); font-size: 10.5px;
+    padding: 4px 9px; border-radius: 4px;
+    background: var(--bg-1); color: var(--fg-4);
+    border: 1px solid var(--border);
     display: inline-flex; align-items: center; gap: 6px;
+    letter-spacing: 0;
   }
-  .signal.on { background: var(--fg); color: var(--bg); }
-  .signal-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .6; }
-  .signal.on .signal-dot { opacity: 1; }
+  .signal.on { background: var(--accent-soft); color: var(--accent); border-color: rgba(180,255,57,.25); }
+  .signal-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
   /* Steps */
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; counter-reset: step; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; counter-reset: step; }
   .step {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 22px;
-    position: relative;
+    border-radius: var(--r-lg); padding: 24px;
+    position: relative; transition: border-color .2s, background .2s;
   }
+  .step:hover { border-color: var(--border-hi); background: var(--surface-hi); }
   .step::before {
     counter-increment: step;
     content: counter(step, decimal-leading-zero);
-    font-family: var(--serif); font-size: 13px; font-weight: 500;
-    color: var(--accent); letter-spacing: .1em;
-    display: block; margin-bottom: 12px;
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    color: var(--fg-4); letter-spacing: 0;
+    display: block; margin-bottom: 14px;
   }
-  .step h3 { font-family: var(--serif); font-size: 17px; font-weight: 500; margin: 0 0 6px; }
-  .step p { margin: 0; font-size: 14px; color: var(--fg-muted); line-height: 1.55; }
+  .step h3 { font-size: 16px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.015em; }
+  .step p { margin: 0; font-size: 13.5px; color: var(--fg-2); line-height: 1.55; }
 
-  /* How it works */
-  .how { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-  .how-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 20px; }
-  .how-list li { display: flex; gap: 16px; }
-  .how-list .num {
-    flex: 0 0 32px; height: 32px; border-radius: 50%;
-    background: var(--bg-alt); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--serif); font-weight: 600; color: var(--accent);
+  /* How */
+  .how { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .how-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+  .how-list li {
+    display: flex; gap: 16px; padding: 20px 0;
+    border-bottom: 1px solid var(--border);
   }
-  .how-list h4 { margin: 4px 0 4px; font-size: 15px; font-weight: 600; }
-  .how-list p { margin: 0; font-size: 14px; color: var(--fg-muted); line-height: 1.55; }
-  .how-list code { font-size: 12px; }
+  .how-list li:last-child { border-bottom: 0; }
+  .how-list .num {
+    flex: 0 0 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); border: 1px solid rgba(180,255,57,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 500; color: var(--accent);
+    font-size: 12px;
+  }
+  .how-list h4 { margin: 4px 0 4px; font-size: 15px; font-weight: 600; letter-spacing: -.015em; }
+  .how-list p { margin: 0; font-size: 14px; color: var(--fg-2); line-height: 1.55; }
 
   .formula {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 28px;
-    font-family: var(--mono); font-size: 13px; line-height: 1.9;
+    border-radius: var(--r-lg); padding: 24px;
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+    display: flex; flex-direction: column; gap: 0;
   }
-  .formula-row { display: flex; gap: 12px; align-items: center; }
-  .formula-row + .formula-row { margin-top: 4px; padding-top: 12px; border-top: 1px dashed var(--border); }
-  .formula-cond { flex: 1; }
-  .formula-arrow { color: var(--fg-soft); }
-  .formula-tag { padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 11px; letter-spacing: .05em; }
+  .formula-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 14px; align-items: center;
+    padding: 14px 0;
+  }
+  .formula-row + .formula-row { border-top: 1px solid var(--border); }
+  .formula-cond { color: var(--fg-2); letter-spacing: 0; }
+  .formula-cond b { color: var(--fg); font-weight: 500; }
+  .formula-arrow { color: var(--fg-4); font-size: 14px; }
+  .formula-tag {
+    padding: 4px 10px; border-radius: var(--r-sm);
+    font-size: 11px; font-weight: 500; letter-spacing: .02em;
+  }
   .formula-tag.fake { background: var(--fake-bg); color: var(--fake); }
   .formula-tag.real { background: var(--real-bg); color: var(--real); }
   .formula-tag.mixed { background: var(--mixed-bg); color: var(--mixed); }
 
   /* Limitations */
-  .limits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .limits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .limit {
-    padding: 20px; border-radius: var(--radius);
-    background: var(--bg-alt); border: 1px solid var(--border);
+    padding: 24px; border-radius: var(--r-lg);
+    background: var(--surface); border: 1px solid var(--border);
+    transition: border-color .2s;
   }
-  .limit-icon { font-size: 18px; margin-bottom: 8px; }
-  .limit h4 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
-  .limit p { margin: 0; font-size: 13px; color: var(--fg-muted); line-height: 1.55; }
+  .limit:hover { border-color: var(--border-hi); }
+  .limit-label { font-family: var(--mono); font-size: 11px; color: var(--fg-4); margin-bottom: 10px; letter-spacing: 0; }
+  .limit h4 { margin: 0 0 6px; font-size: 15px; font-weight: 600; letter-spacing: -.015em; }
+  .limit p { margin: 0; font-size: 13.5px; color: var(--fg-2); line-height: 1.55; }
 
   /* Source */
-  .source-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .source-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
   .source-head {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 18px; border-bottom: 1px solid var(--border);
-    background: var(--bg-alt);
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
   }
-  .source-filename { font-family: var(--mono); font-size: 13px; color: var(--fg-muted); }
+  .source-head-left { display: flex; align-items: center; gap: 10px; }
+  .source-dots { display: flex; gap: 5px; }
+  .source-dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--border-hi); }
+  .source-filename { font-family: var(--mono); font-size: 12px; color: var(--fg-3); }
   .copy-btn {
-    font: inherit; font-size: 12px; font-weight: 500;
-    background: var(--surface); border: 1px solid var(--border-strong);
-    color: var(--fg); padding: 5px 12px; border-radius: 6px;
-    cursor: pointer; transition: all .15s ease;
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border-hi);
+    color: var(--fg-1); padding: 5px 12px; border-radius: var(--r-sm);
+    cursor: pointer; transition: all .15s;
   }
   .copy-btn:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
   pre.source {
-    margin: 0; padding: 18px 20px;
-    font-family: var(--mono); font-size: 12px; line-height: 1.6;
+    margin: 0; padding: 20px 22px;
+    font-family: var(--mono); font-size: 12px; line-height: 1.65;
     max-height: 420px; overflow: auto;
-    background: var(--surface); color: var(--fg);
+    background: var(--surface); color: var(--fg-1);
   }
+  pre.source::-webkit-scrollbar { width: 10px; height: 10px; }
+  pre.source::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 4px; }
+  pre.source::-webkit-scrollbar-track { background: transparent; }
 
   footer {
-    padding: 48px 0 64px; border-top: 1px solid var(--border);
+    padding: 40px 0 56px; margin-top: 32px;
+    border-top: 1px solid var(--border);
     display: flex; justify-content: space-between; align-items: center;
-    color: var(--fg-muted); font-size: 13px;
+    color: var(--fg-3); font-size: 13px;
   }
-  footer a { color: var(--fg-muted); }
+  footer a { color: var(--fg-2); }
+  footer a:hover { color: var(--fg); }
 
-  @media (max-width: 880px) {
-    .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 40px; }
-    .hero-art { min-height: 280px; }
+  @media (max-width: 960px) {
+    .hero { grid-template-columns: 1fr; gap: 48px; padding: 64px 0 56px; }
+    .hero-art { min-height: 320px; justify-content: center; }
     .verdicts { grid-template-columns: 1fr; }
     .steps { grid-template-columns: 1fr 1fr; }
     .how { grid-template-columns: 1fr; gap: 24px; }
     .limits { grid-template-columns: 1fr; }
   }
-  @media (max-width: 520px) {
+  @media (max-width: 560px) {
+    .nav-links { display: none; }
     .steps { grid-template-columns: 1fr; }
-    section { padding: 56px 0; }
+    section { padding: 72px 0; }
+    .drag-zone { flex-direction: column; align-items: stretch; }
+    .drag { justify-content: center; }
     footer { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .mock-panel-2 { display: none; }
   }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <div class="brand"><span class="brand-mark">🪞</span> Mirror Check</div>
-  <div class="nav-links">
-    <a href="#verdicts">판정</a>
-    <a href="#how-to-use">사용법</a>
-    <a href="#how">원리</a>
-    <a href="https://github.com/devcsb/mirror-check" target="_blank" rel="noopener">GitHub</a>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-dot"></span> mirror-check</div>
+    <div class="nav-links">
+      <a href="#verdicts">판정</a>
+      <a href="#how-to-use">사용법</a>
+      <a href="#how">원리</a>
+      <a href="#source">소스</a>
+    </div>
+    <a class="nav-cta" href="https://github.com/devcsb/mirror-check" target="_blank" rel="noopener">GitHub →</a>
   </div>
 </nav>
 
 <main>
 
-  <section class="hero" style="border: 0; padding-top: 40px;">
+  <section class="hero" style="border: 0;">
     <div>
-      <span class="hero-tag"><span class="hero-tag-dot"></span> 북마클릿 · 설치 불필요</span>
+      <span class="badge"><span class="badge-chip">v1.0</span> 북마클릿 · 설치 불필요 · 6KB</span>
       <h1>
         <span class="line">당신이 누른 그 버튼,</span>
         <span class="line"><em>진짜</em> 누구에게 닿았나요?</span>
       </h1>
       <p class="hero-sub">
         <b>"도움됐어요"</b>, <b>"인기 급상승"</b>, <b>"방금 결제됨"</b>.
-        이런 버튼이 <b>실제 서버 집계</b>인지, 내 브라우저만 보는
-        <b>거울 속 숫자</b>인지 — 클릭 한 번으로 판정합니다.
+        이런 버튼이 실제 서버 집계인지, 내 브라우저만 보는
+        거울 속 숫자인지 — <b>클릭 한 번으로 판정</b>합니다.
       </p>
       <div class="drag-zone">
-        <div class="drag-label">↓ 북마크바로 드래그</div>
         <a id="bm" class="drag" href="#" draggable="true">
-          <span>🪞</span><span>Mirror Check</span>
+          <span>🪞</span><span>Mirror Check</span><span class="drag-arrow">↗</span>
         </a>
-        <p class="drag-hint">
-          이 버튼을 브라우저 <b>북마크바</b>로 끌어다 놓으세요.
-          북마크바가 안 보이면 <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>.
-        </p>
+        <div class="drag-hint">
+          이 버튼을 <b>북마크바</b>로 드래그.<br/>
+          안 보이면 <kbd>⌘</kbd><kbd>⇧</kbd><kbd>B</kbd>.
+        </div>
       </div>
     </div>
 
     <div class="hero-art" aria-hidden="true">
       <div class="mock-panel mock-panel-2">
         <div class="mock-head">
-          <span class="mock-title">🪞 Mirror Check</span>
+          <span class="mock-title"><span class="mock-dot"></span>Mirror Check</span>
           <span class="mock-close">닫기</span>
         </div>
         <div class="mock-body">
           <div class="mock-verdict mock-verdict-real">
             <div class="mock-tag">REAL</div>
-            <div class="mock-msg">서버 요청 발생 → 실제 집계 가능성 높음</div>
+            <div class="mock-msg">서버 요청 발생 → 실제 집계</div>
           </div>
           <div class="mock-stats">
-            <div class="mock-stat on"><div class="mock-stat-l">클릭</div><div class="mock-stat-v">1</div></div>
-            <div class="mock-stat"><div class="mock-stat-l">로컬</div><div class="mock-stat-v">0</div></div>
-            <div class="mock-stat"><div class="mock-stat-l">쿠키</div><div class="mock-stat-v">0</div></div>
-            <div class="mock-stat on"><div class="mock-stat-l">요청</div><div class="mock-stat-v">1</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">click</div><div class="mock-stat-v">1</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">local</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">cookie</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">net</div><div class="mock-stat-v">1</div></div>
           </div>
         </div>
       </div>
       <div class="mock-panel mock-panel-1">
         <div class="mock-head">
-          <span class="mock-title">🪞 Mirror Check</span>
+          <span class="mock-title"><span class="mock-dot"></span>Mirror Check</span>
           <span class="mock-close">닫기</span>
         </div>
         <div class="mock-body">
@@ -362,10 +479,10 @@
             <div class="mock-msg">로컬 저장만 발생, 서버 전송 없음</div>
           </div>
           <div class="mock-stats">
-            <div class="mock-stat on"><div class="mock-stat-l">클릭</div><div class="mock-stat-v">1</div></div>
-            <div class="mock-stat on"><div class="mock-stat-l">로컬</div><div class="mock-stat-v">8</div></div>
-            <div class="mock-stat"><div class="mock-stat-l">쿠키</div><div class="mock-stat-v">0</div></div>
-            <div class="mock-stat"><div class="mock-stat-l">요청</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">click</div><div class="mock-stat-v">1</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">local</div><div class="mock-stat-v">8</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">cookie</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">net</div><div class="mock-stat-v">0</div></div>
           </div>
           <div class="mock-section">로컬/세션 저장 · 2</div>
           <div class="mock-row">
@@ -384,36 +501,45 @@
 
   <section id="verdicts">
     <div class="section-head">
-      <div class="section-kicker">3가지 판정</div>
-      <h2 class="section-title">어떤 결과를 보게 되나요?</h2>
-      <p class="section-lede">버튼 클릭 후 2.5초 동안 로컬 저장과 네트워크를 관찰해서 셋 중 하나로 판정합니다.</p>
+      <div class="kicker">verdicts</div>
+      <h2>세 가지 판정, 2.5초 안에.</h2>
+      <p class="lede">버튼 클릭 후 로컬 저장과 네트워크 호출을 관찰해서 셋 중 하나로 분류합니다.</p>
     </div>
     <div class="verdicts">
       <div class="verdict verdict-fake">
-        <span class="verdict-badge">FAKE</span>
+        <div class="verdict-head">
+          <span class="verdict-badge">FAKE</span>
+          <span class="verdict-dot"></span>
+        </div>
         <h3 class="verdict-title">거울을 보고 있었네요</h3>
-        <p class="verdict-desc">localStorage나 쿠키만 바뀌고 서버로는 아무것도 안 갑니다. 당신 화면에서만 숫자가 올라가는 가짜 카운터.</p>
+        <p class="verdict-desc">localStorage나 쿠키만 바뀌고 서버엔 아무것도 안 갑니다. 당신 화면에서만 숫자가 올라가는 가짜 카운터.</p>
         <div class="verdict-signals">
-          <span class="signal on"><span class="signal-dot"></span>로컬 저장</span>
-          <span class="signal"><span class="signal-dot"></span>네트워크</span>
+          <span class="signal on"><span class="signal-dot"></span>local</span>
+          <span class="signal"><span class="signal-dot"></span>network</span>
         </div>
       </div>
       <div class="verdict verdict-real">
-        <span class="verdict-badge">REAL</span>
+        <div class="verdict-head">
+          <span class="verdict-badge">REAL</span>
+          <span class="verdict-dot"></span>
+        </div>
         <h3 class="verdict-title">서버에 잘 닿았어요</h3>
         <p class="verdict-desc">fetch·XHR·beacon 중 하나로 서버에 요청이 갔고, 로컬 저장은 없습니다. 진짜 집계일 가능성이 높습니다.</p>
         <div class="verdict-signals">
-          <span class="signal"><span class="signal-dot"></span>로컬 저장</span>
-          <span class="signal on"><span class="signal-dot"></span>네트워크</span>
+          <span class="signal"><span class="signal-dot"></span>local</span>
+          <span class="signal on"><span class="signal-dot"></span>network</span>
         </div>
       </div>
       <div class="verdict verdict-mixed">
-        <span class="verdict-badge">MIXED</span>
+        <div class="verdict-head">
+          <span class="verdict-badge">MIXED</span>
+          <span class="verdict-dot"></span>
+        </div>
         <h3 class="verdict-title">서버 + 중복방지 캐시</h3>
         <p class="verdict-desc">서버 요청과 로컬 저장이 모두 발생. 대부분 "이미 눌렀음"을 기억하려는 정상 패턴입니다.</p>
         <div class="verdict-signals">
-          <span class="signal on"><span class="signal-dot"></span>로컬 저장</span>
-          <span class="signal on"><span class="signal-dot"></span>네트워크</span>
+          <span class="signal on"><span class="signal-dot"></span>local</span>
+          <span class="signal on"><span class="signal-dot"></span>network</span>
         </div>
       </div>
     </div>
@@ -421,35 +547,35 @@
 
   <section id="how-to-use">
     <div class="section-head">
-      <div class="section-kicker">사용법</div>
-      <h2 class="section-title">30초 안에 끝납니다</h2>
-      <p class="section-lede">설치도, 가입도, 확장 프로그램 권한도 필요 없습니다.</p>
+      <div class="kicker">getting started</div>
+      <h2>30초 안에 끝납니다.</h2>
+      <p class="lede">설치도, 가입도, 확장 프로그램 권한도 필요 없습니다.</p>
     </div>
     <div class="steps">
       <div class="step">
         <h3>북마크바에 드래그</h3>
-        <p>상단 <b>🪞 Mirror Check</b> 버튼을 브라우저 북마크바로 끌어다 놓습니다.</p>
+        <p>상단 <b>Mirror Check</b> 버튼을 브라우저 북마크바로 끌어다 놓습니다.</p>
       </div>
       <div class="step">
         <h3>의심 페이지로 이동</h3>
         <p>"도움됐어요", "인기 급상승" 같은 버튼이 있는 페이지로 갑니다.</p>
       </div>
       <div class="step">
-        <h3>북마크 클릭 → 버튼 클릭</h3>
+        <h3>북마크 → 버튼 클릭</h3>
         <p>북마크로 감지기를 켠 뒤, 검사하고 싶은 버튼을 누릅니다.</p>
       </div>
       <div class="step">
         <h3>판정 확인</h3>
-        <p>우하단 패널에 <code>FAKE</code>/<code>REAL</code>/<code>MIXED</code>가 즉시 표시됩니다.</p>
+        <p>우하단 패널에 <span class="mono">FAKE</span>/<span class="mono">REAL</span>/<span class="mono">MIXED</span>가 즉시 표시됩니다.</p>
       </div>
     </div>
   </section>
 
   <section id="how">
     <div class="section-head">
-      <div class="section-kicker">작동 원리</div>
-      <h2 class="section-title">거창한 AI 없이, 세 줄 규칙</h2>
-      <p class="section-lede">JavaScript의 기본 API를 후킹해 클릭 전후의 부수효과를 비교합니다.</p>
+      <div class="kicker">how it works</div>
+      <h2>거창한 AI 없이, 세 줄 규칙.</h2>
+      <p class="lede">JavaScript의 기본 API를 후킹해 클릭 전후의 부수효과를 비교합니다.</p>
     </div>
     <div class="how">
       <ul class="how-list">
@@ -471,23 +597,23 @@
           <div class="num">3</div>
           <div>
             <h4>2.5초 윈도우 비교</h4>
-            <p>클릭 직후 2.5초 동안 수집된 로그를 아래 규칙에 따라 분류해 판정을 내립니다.</p>
+            <p>클릭 직후 2.5초 동안 수집된 시그널을 아래 규칙으로 분류해 판정을 내립니다.</p>
           </div>
         </li>
       </ul>
       <div class="formula" aria-label="판정 규칙">
         <div class="formula-row">
-          <div class="formula-cond">로컬 쓰기만 있음<br/><span style="color:var(--fg-soft)">&amp; 네트워크 0</span></div>
+          <div class="formula-cond"><b>local</b> &nbsp;+&nbsp; <span style="color:var(--fg-4)">no network</span></div>
           <div class="formula-arrow">→</div>
           <span class="formula-tag fake">FAKE</span>
         </div>
         <div class="formula-row">
-          <div class="formula-cond">네트워크만 있음<br/><span style="color:var(--fg-soft)">&amp; 로컬 쓰기 0</span></div>
+          <div class="formula-cond"><span style="color:var(--fg-4)">no local</span> &nbsp;+&nbsp; <b>network</b></div>
           <div class="formula-arrow">→</div>
           <span class="formula-tag real">REAL</span>
         </div>
         <div class="formula-row">
-          <div class="formula-cond">둘 다 있음</div>
+          <div class="formula-cond"><b>local</b> &nbsp;+&nbsp; <b>network</b></div>
           <div class="formula-arrow">→</div>
           <span class="formula-tag mixed">MIXED</span>
         </div>
@@ -497,38 +623,41 @@
 
   <section>
     <div class="section-head">
-      <div class="section-kicker">한계</div>
-      <h2 class="section-title">만능은 아닙니다</h2>
-      <p class="section-lede">아래 경우에는 잘못 판정할 수 있으니 결과를 맹신하지 마세요.</p>
+      <div class="kicker">limitations</div>
+      <h2>만능은 아닙니다.</h2>
+      <p class="lede">아래 경우에는 잘못 판정할 수 있으니 결과를 맹신하지 마세요.</p>
     </div>
     <div class="limits">
       <div class="limit">
-        <div class="limit-icon">⚡</div>
+        <div class="limit-label">01 / SW + WS</div>
         <h4>Service Worker · WebSocket</h4>
         <p>SW가 가로채거나 WebSocket으로 전송하면 fetch·XHR 훅에 안 걸려 <b>REAL인데 FAKE로</b> 오판할 수 있습니다.</p>
       </div>
       <div class="limit">
-        <div class="limit-icon">⏱️</div>
+        <div class="limit-label">02 / batching</div>
         <h4>디바운스 배치 전송</h4>
-        <p>클릭을 모았다가 수 초 뒤 한꺼번에 보내는 사이트는 2.5초 윈도우를 놓칠 수 있습니다. <code>windowMs</code>를 늘려 사용하세요.</p>
+        <p>클릭을 모았다가 수 초 뒤 보내는 사이트는 2.5초 윈도우를 놓칠 수 있습니다. <code>windowMs</code>를 늘려 사용하세요.</p>
       </div>
       <div class="limit">
-        <div class="limit-icon">🛡️</div>
+        <div class="limit-label">03 / CSP</div>
         <h4>엄격한 CSP</h4>
         <p>일부 페이지는 <code>Content-Security-Policy</code>로 인라인 스크립트 실행 자체를 막아 북마클릿이 동작하지 않을 수 있습니다.</p>
       </div>
     </div>
   </section>
 
-  <section>
+  <section id="source">
     <div class="section-head">
-      <div class="section-kicker">오픈소스</div>
-      <h2 class="section-title">전체 소스</h2>
-      <p class="section-lede">100줄 남짓, 숨기는 것 없이 전부 여기 있습니다. 직접 읽어보세요.</p>
+      <div class="kicker">source</div>
+      <h2>100줄, 숨기는 것 없이.</h2>
+      <p class="lede">전체 소스는 여기 다 있습니다. 직접 읽고, 복사하고, 수정하세요.</p>
     </div>
     <div class="source-wrap">
       <div class="source-head">
-        <span class="source-filename">bookmarklet.js</span>
+        <div class="source-head-left">
+          <span class="source-dots"><span></span><span></span><span></span></span>
+          <span class="source-filename">bookmarklet.js</span>
+        </div>
         <button class="copy-btn" id="copy-btn" type="button">복사</button>
       </div>
       <pre class="source" id="src">로딩 중…</pre>
@@ -536,8 +665,11 @@
   </section>
 
   <footer>
-    <div>Made with 🪞 — <a href="https://github.com/devcsb/mirror-check" target="_blank" rel="noopener">github.com/devcsb/mirror-check</a></div>
-    <div>MIT</div>
+    <div>
+      <span style="color: var(--fg-4);">↳</span>
+      <a href="https://github.com/devcsb/mirror-check" target="_blank" rel="noopener">github.com/devcsb/mirror-check</a>
+    </div>
+    <div class="mono" style="color: var(--fg-4); font-size: 12px;">MIT · 2026</div>
   </footer>
 </main>
 
@@ -554,8 +686,16 @@
     try {
       await navigator.clipboard.writeText(src);
       const orig = btn.textContent;
-      btn.textContent = '복사됨 ✓';
-      setTimeout(() => (btn.textContent = orig), 1400);
+      btn.textContent = '복사됨';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'var(--bg)';
+      btn.style.borderColor = 'var(--accent)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.background = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 1400);
     } catch {
       btn.textContent = '복사 실패';
     }
