@@ -120,27 +120,42 @@
   /* Hero illustration: stacked mock panel */
   .hero-art { position: relative; height: 100%; min-height: 340px; }
   .mock-panel {
-    position: absolute; width: 320px;
+    position: absolute; width: 300px;
     background: #0f1317; color: #e6edf3;
     border-radius: 12px; border: 1px solid #2b313a;
-    font: 12px/1.5 var(--mono);
-    padding: 14px 16px;
+    font-family: var(--mono); font-size: 11px; line-height: 1.5;
     box-shadow: 0 30px 60px -20px rgba(140,74,51,.35), 0 12px 24px rgba(31,31,30,.12);
+    overflow: hidden;
   }
   .mock-panel-1 { top: 0; right: 0; transform: rotate(2.5deg); z-index: 2; }
-  .mock-panel-2 { top: 40px; right: 80px; transform: rotate(-3deg); z-index: 1; opacity: .9; }
-  .mock-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .mock-title { font-weight: 700; font-size: 13px; color: #f0ebe1; }
-  .mock-close { font-size: 10px; color: #8a867d; background: #21262d; border-radius: 4px; padding: 1px 6px; }
-  .mock-verdict { padding: 8px 10px; border-radius: 8px; background: #161b22; border-left: 3px solid; margin-bottom: 8px; }
+  .mock-panel-2 { top: 60px; right: 80px; transform: rotate(-3deg); z-index: 1; opacity: .92; }
+  .mock-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px; background: #161b22; border-bottom: 1px solid #2b313a;
+  }
+  .mock-title { font-family: var(--sans); font-weight: 600; font-size: 12px; color: #f0ebe1; display: flex; align-items: center; gap: 6px; }
+  .mock-close { font-family: var(--sans); font-size: 10px; color: #c9d1d9; background: #21262d; border: 1px solid #30363d; border-radius: 5px; padding: 3px 8px; }
+  .mock-body { padding: 12px 14px; }
+  .mock-verdict { padding: 8px 10px; border-radius: 8px; background: #161b22; border-left: 3px solid; margin-bottom: 10px; }
   .mock-verdict-fake { border-color: #f85149; }
   .mock-verdict-fake .mock-tag { color: #f85149; }
   .mock-verdict-real { border-color: #3fb950; }
   .mock-verdict-real .mock-tag { color: #3fb950; }
-  .mock-tag { font-weight: 700; font-size: 12px; margin-bottom: 2px; }
-  .mock-msg { color: #c9d1d9; font-size: 11px; }
-  .mock-row { color: #7d8590; font-size: 11px; margin: 3px 0; }
-  .mock-row b { color: #e6edf3; font-weight: 500; }
+  .mock-tag { font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .06em; margin-bottom: 2px; }
+  .mock-msg { font-family: var(--sans); color: #c9d1d9; font-size: 11px; }
+  .mock-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
+  .mock-stat { background: #161b22; border: 1px solid #2b313a; border-radius: 5px; padding: 5px 4px; text-align: center; }
+  .mock-stat.on { background: #1c2430; border-color: #3a4552; }
+  .mock-stat-l { font-family: var(--sans); color: #6b7280; font-size: 9px; letter-spacing: .04em; }
+  .mock-stat.on .mock-stat-l { color: #8b949e; }
+  .mock-stat-v { font-family: var(--sans); font-weight: 600; font-size: 13px; color: #4b5563; }
+  .mock-stat.on .mock-stat-v { color: #f0ebe1; }
+  .mock-row { display: flex; align-items: center; gap: 6px; padding: 5px 7px; border-radius: 4px; background: #161b22; margin-bottom: 3px; font-size: 10.5px; }
+  .mock-key { color: #e6edf3; font-weight: 500; }
+  .mock-badge { color: #d29922; background: #2b2311; padding: 0 5px; border-radius: 3px; font-weight: 600; font-size: 9.5px; }
+  .mock-val { color: #8b949e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mock-meth { color: #7ee787; font-weight: 600; font-size: 9.5px; min-width: 36px; }
+  .mock-section { color: #7d8590; font-family: var(--sans); font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin: 8px 2px 5px; }
 
   /* ─── SECTION ─── */
   section { padding: 72px 0; border-top: 1px solid var(--border); }
@@ -314,23 +329,46 @@
           <span class="mock-title">🪞 Mirror Check</span>
           <span class="mock-close">닫기</span>
         </div>
-        <div class="mock-verdict mock-verdict-real">
-          <div class="mock-tag">REAL</div>
-          <div class="mock-msg">서버 요청 발생 → 실제 집계 가능성 높음</div>
+        <div class="mock-body">
+          <div class="mock-verdict mock-verdict-real">
+            <div class="mock-tag">REAL</div>
+            <div class="mock-msg">서버 요청 발생 → 실제 집계 가능성 높음</div>
+          </div>
+          <div class="mock-stats">
+            <div class="mock-stat on"><div class="mock-stat-l">클릭</div><div class="mock-stat-v">1</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">로컬</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">쿠키</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">요청</div><div class="mock-stat-v">1</div></div>
+          </div>
         </div>
-        <div class="mock-row">클릭 <b>1</b> · 네트워크 <b>1</b> · 로컬 <b>0</b></div>
       </div>
       <div class="mock-panel mock-panel-1">
         <div class="mock-head">
           <span class="mock-title">🪞 Mirror Check</span>
           <span class="mock-close">닫기</span>
         </div>
-        <div class="mock-verdict mock-verdict-fake">
-          <div class="mock-tag">FAKE</div>
-          <div class="mock-msg">로컬 저장만 발생, 서버 전송 없음 → 가짜 사회적 증거</div>
+        <div class="mock-body">
+          <div class="mock-verdict mock-verdict-fake">
+            <div class="mock-tag">FAKE</div>
+            <div class="mock-msg">로컬 저장만 발생, 서버 전송 없음</div>
+          </div>
+          <div class="mock-stats">
+            <div class="mock-stat on"><div class="mock-stat-l">클릭</div><div class="mock-stat-v">1</div></div>
+            <div class="mock-stat on"><div class="mock-stat-l">로컬</div><div class="mock-stat-v">8</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">쿠키</div><div class="mock-stat-v">0</div></div>
+            <div class="mock-stat"><div class="mock-stat-l">요청</div><div class="mock-stat-v">0</div></div>
+          </div>
+          <div class="mock-section">로컬/세션 저장 · 2</div>
+          <div class="mock-row">
+            <span class="mock-key">local.ig_likes</span>
+            <span class="mock-badge">×7</span>
+            <span class="mock-val">{"dob-007":1000010002…</span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-key">local.ig_favorites</span>
+            <span class="mock-val">["etc-001","pai-003"]</span>
+          </div>
         </div>
-        <div class="mock-row">• <b>localStorage</b> helpful_post_42 = "true"</div>
-        <div class="mock-row">• 네트워크 요청 <b>없음</b></div>
       </div>
     </div>
   </section>
