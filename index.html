@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>Mirror Check — 가짜 사회적 증거 탐지기</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0b0f14; color: #e6edf3; font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  .sub { color: #8b949e; margin-bottom: 32px; }
+  .drag {
+    display: inline-block; padding: 12px 20px; border-radius: 10px;
+    background: #238636; color: white; font-weight: 600; text-decoration: none;
+    border: 1px solid #2ea043; user-select: none; cursor: grab;
+  }
+  .drag:hover { background: #2ea043; }
+  .hint { color: #7d8590; font-size: 13px; margin-top: 8px; }
+  h2 { margin-top: 40px; border-bottom: 1px solid #21262d; padding-bottom: 8px; font-size: 18px; }
+  ol li { margin: 6px 0; }
+  pre {
+    background: #161b22; border: 1px solid #21262d; border-radius: 8px;
+    padding: 12px; overflow: auto; font-size: 12px; max-height: 300px;
+  }
+  kbd { background: #21262d; border: 1px solid #30363d; border-radius: 4px; padding: 1px 6px; font-size: 12px; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .fake { background: #490202; color: #ff7b72; }
+  .real { background: #033a16; color: #56d364; }
+  .mixed { background: #3d2e00; color: #e3b341; }
+  a { color: #58a6ff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🪞 Mirror Check</h1>
+  <p class="sub">"도움됐어요" 같은 버튼이 <b>실제 서버 집계</b>인지, 사용자가 자기 <b>거울을 보고 있는 것(로컬 저장)</b>에 불과한지 한 번에 판정합니다.</p>
+
+  <a id="bm" class="drag" href="#">🪞 Mirror Check (드래그해서 북마크바에 놓기)</a>
+  <div class="hint">이 링크를 <b>북마크바로 드래그</b>하세요. 이미 북마크가 있고 소스를 수정했다면 다시 드래그해 갱신하세요.</div>
+
+  <h2>사용법</h2>
+  <ol>
+    <li>검사할 페이지로 이동합니다. 예: <a href="https://tael.github.io/interior-guide/" target="_blank" rel="noopener">tael.github.io/interior-guide</a></li>
+    <li>북마크바의 <b>🪞 Mirror Check</b>를 클릭합니다. 우하단에 패널이 뜹니다.</li>
+    <li>의심스러운 버튼(예: "도움됐어요")을 클릭합니다.</li>
+    <li>판정을 확인합니다:
+      <ul>
+        <li><span class="tag fake">FAKE</span> localStorage/cookie만 변하고 네트워크 요청이 없음 → 가짜</li>
+        <li><span class="tag real">REAL</span> 서버 요청 발생, 로컬 저장 없음 → 실제 서버 집계</li>
+        <li><span class="tag mixed">MIXED</span> 둘 다 발생 → 서버 집계 + 로컬 캐시(중복 방지용)</li>
+      </ul>
+    </li>
+    <li>다시 클릭하면 패널이 닫힙니다.</li>
+  </ol>
+
+  <h2>작동 원리 (3줄 요약)</h2>
+  <ol>
+    <li><code>Storage.prototype.setItem</code>, <code>document.cookie</code> setter를 <b>monkey-patch</b>해 로컬 쓰기를 기록합니다.</li>
+    <li><code>fetch</code>, <code>XMLHttpRequest.open</code>, <code>navigator.sendBeacon</code>을 래핑해 네트워크 호출을 기록합니다.</li>
+    <li>클릭 직후 2.5초 창(window) 내 로그를 비교해 verdict를 결정합니다.</li>
+  </ol>
+
+  <h2>한계</h2>
+  <ul>
+    <li>서버 요청이 <b>Service Worker</b>를 거치거나 <b>WebSocket</b>으로 전송되면 탐지되지 않을 수 있습니다.</li>
+    <li>버튼 클릭 후 <b>디바운스(수 초 지연)</b> 후 배치 전송하는 경우 감지창을 놓칠 수 있습니다 — 필요 시 코드의 <code>windowMs</code>를 늘리세요.</li>
+    <li>엄격한 CSP(<code>Content-Security-Policy</code>)가 걸린 페이지에서는 북마클릿 실행이 차단될 수 있습니다.</li>
+  </ul>
+
+  <h2>소스</h2>
+  <pre id="src">로딩 중...</pre>
+</main>
+
+<script>
+(async function () {
+  const res = await fetch('./bookmarklet.js');
+  const src = await res.text();
+  document.getElementById('src').textContent = src;
+  const url = 'javascript:' + encodeURIComponent(src);
+  document.getElementById('bm').href = url;
+})();
+</script>
+</body>
+</html>
