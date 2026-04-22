@@ -87,11 +87,17 @@
   .hero-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
   .hero h1 {
     font-family: var(--serif);
-    font-size: clamp(40px, 5.5vw, 64px);
-    line-height: 1.05; letter-spacing: -.025em;
-    margin: 16px 0 18px; font-weight: 500;
+    font-size: clamp(38px, 5.2vw, 60px);
+    line-height: 1.12; letter-spacing: -.025em;
+    margin: 18px 0 20px; font-weight: 500;
+    word-break: keep-all;
   }
-  .hero h1 .mirror { display: inline-block; transform: translateY(-2px); }
+  .hero h1 .line { display: block; }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent-ink);
+    font-weight: 500;
+  }
   .hero-sub { font-size: 18px; color: var(--fg-muted); max-width: 520px; margin: 0 0 28px; }
   .hero-sub b { color: var(--fg); font-weight: 600; }
 
@@ -305,7 +311,10 @@
   <section class="hero" style="border: 0; padding-top: 40px;">
     <div>
       <span class="hero-tag"><span class="hero-tag-dot"></span> 북마클릿 · 설치 불필요</span>
-      <h1>당신이 누른 그 버튼,<br/><span class="mirror">🪞</span> 진짜 누구에게 닿았나요?</h1>
+      <h1>
+        <span class="line">당신이 누른 그 버튼,</span>
+        <span class="line"><em>진짜</em> 누구에게 닿았나요?</span>
+      </h1>
       <p class="hero-sub">
         <b>"도움됐어요"</b>, <b>"인기 급상승"</b>, <b>"방금 결제됨"</b>.
         이런 버튼이 <b>실제 서버 집계</b>인지, 내 브라우저만 보는
